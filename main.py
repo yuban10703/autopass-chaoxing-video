@@ -89,7 +89,7 @@ class PassVideo:
                         # print(video_info)
                         playingTime = 0
                         sec = 58
-                        for i in range(video_info['duration']):
+                        for i in range(video_info['duration'] + 60):
                             if sec == 58:
                                 sec = 0
                                 res = self.chaoxing.pass_video(
