@@ -25,7 +25,7 @@ class PassVideo:
         if one == all_count:
             mene = ''
         else:
-            mene = '   少女折寿中' + '.' * (one % 3 + 1)
+            mene = '   少女折寿中' + '.' * (one % 3 + 1) + '      '
         print('\r[', '#' * left, symbol, ' ' * right, ']',
               f' {percent:.0f}%', mene,
               sep='', end='', flush=True)
@@ -51,11 +51,10 @@ class PassVideo:
         if not self.chaoxing.login():
             print('登录失败')
             return
-        time.sleep(0.5)
         if all_course := chaoxing.get_course():
             course_all_id_data = self.process_course(all_course['channelList'])
             for i in range(len(course_all_id_data)):
-                print(f"| {i} |  {course_all_id_data[i]} \r\n")
+                print(f"| {i} | {course_all_id_data[i]['name']} \r\n")
         else:
             print('未获取到课程数据')
             return
@@ -106,7 +105,7 @@ class PassVideo:
                                 playingTime += 58
                                 if res['isPassed']:
                                     self.print_progress_bar(video_info['duration'], video_info['duration'])
-                                    print(f'  已完成    ')
+                                    print(f'  已完成          ')
                                     break
                             self.print_progress_bar(i, video_info['duration'])
                             sec += 1
@@ -114,7 +113,7 @@ class PassVideo:
 
 
 if __name__ == '__main__':
-    username = input('请输入超星账号(最好是手机号): ')
-    password = input('请输入超星密码: ')
+    username = input('请输入超星手机号: ')
+    password = input('请输入密码: ')
     chaoxing = ChaoxingAPI(username, password)
     PassVideo(chaoxing).main()

@@ -2,9 +2,9 @@
 # @Time    : 2021/8/31 08:35
 # @Author  : yuban10703
 
-import hashlib
 import random
 import time
+from hashlib import md5
 
 import httpx
 from retrying import retry
@@ -79,15 +79,6 @@ class ChaoxingAPI:
         }
         return self.client.get(url, params=params).json()
 
-    # def get_nodes(self, clazzid):
-    #     url = 'https://mooc1-api.chaoxing.com/gas/clazz'
-    #     params = {
-    #         'id': clazzid,
-    #         'personid': self.personid,
-    #         'fields': 'id,bbsid,classscore,isstart,allowdownload,chatid,name,state,isthirdaq,isfiled,information,discuss,visiblescore,begindate,coursesetting.fields(id,courseid,hiddencoursecover,hiddenwrongset,coursefacecheck),course.fields(id,name,infocontent,objectid,app,bulletformat,mappingcourseid,imageurl,teacherfactor,knowledge.fields(id,name,indexOrder,parentnodeid,status,layer,label,begintime,endtime,attachment.fields(id,type,objectid,extension).type(video)))',
-    #         'view': 'json'
-    #     }
-    #     return self.client.get(url, params=params).json()
     @retry(stop_max_attempt_number=3)
     def get_jobs_nodes(self, courseid, clazzid, nodes):
         url = 'https://mooc1-api.chaoxing.com/job/myjobsnodesmap'
@@ -102,7 +93,7 @@ class ChaoxingAPI:
         }
         return self.client.post(url, data=data).json()
 
-    @retry(stop_max_attempt_number=3)  # 最大重试次数，超过后正常抛出异常
+    @retry(stop_max_attempt_number=3)
     def get_knowledge_card(self, clazzid, courseid, knowledgeid):
         url = 'https://mooc1-api.chaoxing.com/knowledge/cards'
         params = {
@@ -150,5 +141,5 @@ class ChaoxingAPI:
 
     def get_enc(self, clazzId, jobid, objectId, playingTime, duration):
         # https://github.com/ZhyMC/chaoxing-xuexitong-autoflush/blob/445c8d8a8cc63472dd90cdf2a6ab28542c56d93b/logger.js
-        return hashlib.md5(
+        return md5(
             f"[{clazzId}][{self.userid}][{jobid}][{objectId}][{playingTime * 1000}][d_yHJ!$pdA~5][{duration * 1000}][0_{duration}]".encode()).hexdigest()
