@@ -4,7 +4,7 @@
 import json
 import re
 import time
-
+import random
 from models import ChaoxingAPI
 
 
@@ -34,7 +34,7 @@ class PassVideo:
         backData = []
         for course in course_data:
             if course.get('cataName') != '课程' or type(course.get('key')) != int:
-                print(course)
+                # print(course)
                 continue
             backData.append({
                 'name': course['content']['course']['data'][0]['name'],
@@ -53,8 +53,8 @@ class PassVideo:
             return
         if all_course := chaoxing.get_course():
             course_all_id_data = self.process_course(all_course['channelList'])
-            for i in range(len(course_all_id_data)):
-                print(f"| {i} | {course_all_id_data[i]['name']} \r\n")
+            for index in range(len(course_all_id_data)):
+                print(f"| {index} | {course_all_id_data[index]['name']} \r\n")
         else:
             print('未获取到课程数据')
             return
@@ -65,7 +65,6 @@ class PassVideo:
         for index_id in course_index:
             course_data = self.chaoxing.get_course_data(course_all_id_data[int(index_id)]['clazzid'])
             for knowledge_id_data in course_data['data'][0]['course']['data'][0]['knowledge']['data']:
-                time.sleep(0.5)
                 # print(knowledge_id_data)
                 knowledge_card_web_text = self.chaoxing.get_knowledge_card(
                     course_all_id_data[int(index_id)]['clazzid'],
@@ -89,9 +88,10 @@ class PassVideo:
                         # print(video_info)
                         playingTime = 0
                         sec = 58
-                        for i in range(video_info['duration'] + 60):
-                            if sec == 58:
-                                sec = 0
+                        i = 0
+                        # for i in range(video_info['duration'] + 60):
+                        while True:
+                            if sec >= 58 or i == video_info['duration']:
                                 res = self.chaoxing.pass_video(
                                     attachments['defaults']['cpi'],
                                     video_info['dtoken'],
@@ -102,18 +102,24 @@ class PassVideo:
                                     attachments['attachments'][0]['jobid'],
                                     video_info['objectid']
                                 )
-                                playingTime += 58
+                                playingTime += sec
+                                sec = 0
+                                # print(res)
                                 if res['isPassed']:
                                     self.print_progress_bar(video_info['duration'], video_info['duration'])
                                     print(f'  已完成          ')
                                     break
+                                continue
                             self.print_progress_bar(i, video_info['duration'])
                             sec += 1
+                            i += 1
                             time.sleep(1)
+                    time.sleep(random.randint(1, 3))
 
 
 if __name__ == '__main__':
     username = input('请输入超星手机号: ')
     password = input('请输入密码: ')
     chaoxing = ChaoxingAPI(username, password)
+    # chaoxing = ChaoxingAPI("", "")
     PassVideo(chaoxing).main()

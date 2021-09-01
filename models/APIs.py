@@ -35,13 +35,15 @@ class ChaoxingAPI:
         }
         res_1 = self.client.post(url=url_1, data=data_1).json()
         if res_1.get('status'):
-            print('获取cookie成功_1\r\n', res_1)
+            # print('获取cookie_1成功\r\n', res_1)
+            print('获取cookie_1成功')
         else:
             return False
         url_2 = 'https://sso.chaoxing.com/apis/login/userLogin4Uname.do'
         res_2 = self.client.get(url_2).json()
         if res_2.get('result') == 1:
-            print('获取cookie成功_2\r\n', res_2)
+            # print('获取cookie_2成功\r\n', res_2)
+            print('获取cookie_2成功')
         else:
             return False
         self.userid = self.client.cookies['UID']
@@ -51,7 +53,8 @@ class ChaoxingAPI:
         url = 'https://mooc1-api.chaoxing.com/mycourse/backclazzdata?view=json&mcode='
         res = self.client.get(url).json()
         if res.get('result') == 1:
-            print('获取课程成功\r\n', res)
+            # print('获取课程成功\r\n', res)
+            print('获取课程成功')
             # self.personid =
             return res
 
