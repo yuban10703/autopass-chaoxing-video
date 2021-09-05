@@ -2,9 +2,10 @@
 # @Time    : 2021/8/30 19:51
 # @Author  : yuban10703
 import json
+import random
 import re
 import time
-import random
+
 from models import ChaoxingAPI
 
 
@@ -13,6 +14,12 @@ class PassVideo:
         self.chaoxing = chaoxingAPI
 
     def print_progress_bar(self, one, all_count, width=30):
+        """
+        打印进度条
+          💩
+         💩💩
+        💩💩💩
+        """
         percent = int(one / all_count * 100)
         left = width * percent // 100
         right = width - left
@@ -29,6 +36,8 @@ class PassVideo:
         print('\r[', '#' * left, symbol, ' ' * right, ']',
               f' {percent:.0f}%', mene,
               sep='', end='', flush=True)
+        if one >= all_count:
+            print(f'  已完成          ')
 
     def process_course(self, course_data):
         backData = []
@@ -72,49 +81,52 @@ class PassVideo:
                     knowledge_id_data['id'])
                 # print(knowledge_card_web_text)
                 # print(knowledge_id_data['id'])
-                attachments = self.get_attachments(knowledge_card_web_text)
-                if attachments:
-                    # print(attachments)
-                    if attachments['attachments'] == []:
+                attachments: dict = self.get_attachments(knowledge_card_web_text)
+                if not attachments:
+                    continue
+                if not attachments.get('attachments'):
+                    continue
+                print(f'当前章节:{knowledge_id_data["label"]}:{knowledge_id_data["name"]}')
+                for attachment in attachments['attachments']:  # 遍历任务点
+                    # print(attachment)
+                    if attachment.get('type') != 'video':  # 只刷视频
                         continue
-                    if attachments['attachments'][0].get('objectId') == None:
-                        # print(attachments)
+                    print(f"当前视频:{attachment['property']['name']}")
+                    if attachment.get('isPassed'):  # 跳过已完成的
+                        self.print_progress_bar(1, 1)
                         continue
-                    print(f'当前视频:{knowledge_id_data["label"]}:{knowledge_id_data["name"]}')
-                    if attachments['attachments']:
-                        video_info = self.chaoxing.get_d_token(
-                            attachments['attachments'][0].get('objectId'),
-                            attachments['defaults']['fid'])
-                        # print(video_info)
-                        playingTime = 0
-                        sec = 58
-                        i = 0
-                        # for i in range(video_info['duration'] + 60):
-                        while True:
-                            if sec >= 58 or i == video_info['duration']:
-                                res = self.chaoxing.pass_video(
-                                    attachments['defaults']['cpi'],
-                                    video_info['dtoken'],
-                                    attachments['attachments'][0]['otherInfo'],
-                                    playingTime,
-                                    course_all_id_data[int(index_id)]['clazzid'],
-                                    video_info['duration'],
-                                    attachments['attachments'][0]['jobid'],
-                                    video_info['objectid']
-                                )
-                                playingTime += sec
-                                sec = 0
-                                # print(res)
-                                if res['isPassed']:
-                                    self.print_progress_bar(video_info['duration'], video_info['duration'])
-                                    print(f'  已完成          ')
-                                    break
-                                continue
-                            self.print_progress_bar(i, video_info['duration'])
-                            sec += 1
-                            i += 1
-                            time.sleep(1)
-                    time.sleep(random.randint(1, 3))
+                    video_info = self.chaoxing.get_d_token(
+                        attachment['objectId'],
+                        attachments['defaults']['fid']
+                    )
+                    # print(video_info)
+                    playingTime = 0
+                    sec = 58
+                    i = 0
+                    while True:
+                        if sec >= 58 or i == video_info['duration']:
+                            res = self.chaoxing.pass_video(
+                                attachments['defaults']['cpi'],
+                                video_info['dtoken'],
+                                attachments['attachments'][0]['otherInfo'],
+                                playingTime,
+                                course_all_id_data[int(index_id)]['clazzid'],
+                                video_info['duration'],
+                                attachments['attachments'][0]['jobid'],
+                                video_info['objectid']
+                            )
+                            playingTime += sec
+                            sec = 0
+                            # print(res)
+                            if res['isPassed']:
+                                self.print_progress_bar(video_info['duration'], video_info['duration'])
+                                break
+                            continue
+                        self.print_progress_bar(i, video_info['duration'])
+                        sec += 1
+                        i += 1
+                        time.sleep(1)
+                time.sleep(random.randint(1, 3))
 
 
 if __name__ == '__main__':
