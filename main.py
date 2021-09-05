@@ -111,31 +111,30 @@ class PassVideo:
                         attachments['defaults']['fid']
                     )
                     # print(video_info)
-                    playingTime = 0
+                    # playingTime = 0
                     sec = 58
-                    i = 0
-                    while True:
-                        if sec >= 58 or i == video_info['duration']:
+                    for playingTime in range(video_info['duration'] + 1):
+                        if sec >= 58 or playingTime == video_info['duration']:
+                            sec = 0
                             res = self.chaoxing.pass_video(
                                 attachments['defaults']['cpi'],
                                 video_info['dtoken'],
                                 attachments['attachments'][0]['otherInfo'],
-                                playingTime,
+                                playingTime + random.randint(0, 1),
                                 course_all_id_data[int(index_id)]['clazzid'],
                                 video_info['duration'],
                                 attachments['attachments'][0]['jobid'],
                                 video_info['objectid']
                             )
-                            playingTime += sec
-                            sec = 0
                             # print(res)
-                            if res['isPassed']:
+                            if res.get('isPassed'):
                                 self.print_progress_bar(video_info['duration'], video_info['duration'])
                                 break
+                            elif res.get('error'):
+                                raise Exception('请联系作者')
                             continue
-                        self.print_progress_bar(i, video_info['duration'])
+                        self.print_progress_bar(playingTime, video_info['duration'])
                         sec += 1
-                        i += 1
                         time.sleep(1)
                 time.sleep(random.randint(1, 3))
 
