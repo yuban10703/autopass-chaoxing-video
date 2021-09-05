@@ -56,6 +56,13 @@ class PassVideo:
         if res := re.search(r'window\.AttachmentSetting =({\"attachments\":.*})', text):
             return json.loads(res[1])
 
+    def knowledge_sort(self, all_knowledge):
+        dict_all_knowledge = {}
+        for knowledge in all_knowledge:
+            dict_all_knowledge[knowledge['label']] = knowledge
+        keys_sorted = natsorted(dict_all_knowledge.keys())
+        return [dict_all_knowledge[k] for k in keys_sorted]
+
     def main(self):
         if not self.chaoxing.login():
             print('登录失败')
@@ -73,7 +80,9 @@ class PassVideo:
                 break
         for index_id in course_index:
             course_data = self.chaoxing.get_course_data(course_all_id_data[int(index_id)]['clazzid'])
-            for knowledge_id_data in course_data['data'][0]['course']['data'][0]['knowledge']['data']:
+            # print(course_data)
+            for knowledge_id_data in self.knowledge_sort(
+                    course_data['data'][0]['course']['data'][0]['knowledge']['data']):  # 遍历排序过的任务点
                 # print(knowledge_id_data)
                 knowledge_card_web_text = self.chaoxing.get_knowledge_card(
                     course_all_id_data[int(index_id)]['clazzid'],
