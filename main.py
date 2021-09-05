@@ -120,7 +120,7 @@ class PassVideo:
                                 attachments['defaults']['cpi'],
                                 video_info['dtoken'],
                                 attachments['attachments'][0]['otherInfo'],
-                                playingTime + random.randint(0, 1),
+                                playingTime,
                                 course_all_id_data[int(index_id)]['clazzid'],
                                 video_info['duration'],
                                 attachments['attachments'][0]['jobid'],
