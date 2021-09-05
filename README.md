@@ -11,7 +11,11 @@
 
 ![image-20210905162419642](https://cdn.jsdelivr.net/gh/yuban10703/BlogImgdata/img/20210905162419.png)
 
-输入```.\main.exe``` 后回车启动程序
+输入
+```
+.\main.exe
+```
+回车启动程序
 
 ![image-20210905162653506](https://cdn.jsdelivr.net/gh/yuban10703/BlogImgdata/img/20210905162653.png)
 
@@ -23,20 +27,26 @@
 
 clone项目
 
- ```git clone https://github.com/yuban10703/autopass-chaoxing-video --depth=1```
+```
+ git clone https://github.com/yuban10703/autopass-chaoxing-video --depth=1
+```
 
 进入项目目录
 
-```cd autopass-chaoxing-video```
+ ```
+cd autopass-chaoxing-video
+ ```
 
 安装要用到的包
 
-```pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple```
+```
+pip3 install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
 
 启动
 
-```python3 main.py```
-
-
+```
+python3 main.py
+```
 
 > 断开SSH后保持运行请自己使用screen之类的工具
