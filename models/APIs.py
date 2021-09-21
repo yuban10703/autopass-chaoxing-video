@@ -97,13 +97,28 @@ class ChaoxingAPI:
         return self.client.post(url, data=data).json()
 
     @retry(stop_max_attempt_number=3)
-    def get_knowledge_card(self, clazzid, courseid, knowledgeid):
+    def get_knowledge_json(self, id, courseid):
+        url = 'https://mooc1-api.chaoxing.com/gas/knowledge'
+        enc = self.get_infEnc_and_time()
+        params = {
+            'id': id,
+            'courseid': courseid,
+            'fields': 'id,parentnodeid,indexorder,label,layer,name,begintime,createtime,lastmodifytime,status,jobUnfinishedCount,clickcount,openlock,card.fields(id,knowledgeid,title,knowledgeTitile,description,cardorder).contentcard(all)',
+            'view': 'json',
+            'token': "4faa8662c59590c6f43ae9fe5b002b42",
+            '_time': enc[0],
+            'inf_enc': enc[1]
+        }
+        return self.client.get(url, params=params).json()
+
+    @retry(stop_max_attempt_number=3)
+    def get_knowledge_card(self, clazzid, courseid, knowledgeid, num):
         url = 'https://mooc1-api.chaoxing.com/knowledge/cards'
         params = {
             'clazzid': clazzid,
             'courseid': courseid,
             'knowledgeid': knowledgeid,
-            'num': 0,
+            'num': num,
             'isPhone': 1,
             'control': True,
             'cpi': self.personid
@@ -120,7 +135,7 @@ class ChaoxingAPI:
         }
         return self.client.get(url, params=params).json()
 
-    @retry(stop_max_attempt_number=3)
+    @retry(stop_max_attempt_number=3, wait_random_min=1000, wait_random_max=2000)
     def pass_video(self, personid, dtoken, otherInfo, playingTime, clazzId, duration, jobid, objectId):
         url = 'https://mooc1-api.chaoxing.com/multimedia/log/a/{}/{}'.format(personid, dtoken)
         # print(url)
@@ -141,6 +156,13 @@ class ChaoxingAPI:
             'view': 'json'
         }
         return self.client.get(url, params=params).json()
+
+    def get_infEnc_and_time(self):
+        m_time = str(int(time.time() * 1000))
+        m_token = '4faa8662c59590c6f43ae9fe5b002b42'
+        m_encrypt_str = 'token=' + m_token + '&_time=' + m_time + '&DESKey=Z(AfY@XS'
+        m_inf_enc = md5(m_encrypt_str.encode('utf-8')).hexdigest()
+        return m_time, m_inf_enc
 
     def get_enc(self, clazzId, jobid, objectId, playingTime, duration):
         # https://github.com/ZhyMC/chaoxing-xuexitong-autoflush/blob/445c8d8a8cc63472dd90cdf2a6ab28542c56d93b/logger.js
